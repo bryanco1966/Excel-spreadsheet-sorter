@@ -8,9 +8,10 @@ class ExelSorter():
     name the header column which you want to sort by
     and any variable name you wish to drop as output'''
     def __init__(self, file_name, header_name, *args):
-        self.file_name = file_name
-        self.header_name = header_name
+        self.file_name    = file_name
+        self.header_name  = header_name
         self.drop_columns = args[0]
+        self.df           = None
 
 
     def read_xcel_file(self):
@@ -19,18 +20,15 @@ class ExelSorter():
     def output_xlsx(self, df, name):
         return df.to_excel(name, index = False)
 
-    def produce_reports(self, df):
-        print(self.drop_columns)
-        reports = df[self.header_name].unique()
+    def produce_excel(self):
+        if self.df == None:
+            self.df = self.read_xcel_file()
+        reports = self.df[self.header_name].unique()
         for report in reports:
-            df1 = df[df[self.header_name]==report]
+            df1 = self.df[self.df[self.header_name]==report]
             df1.drop(axis = 1,columns = self.drop_columns, inplace = True)
             file_name = f'{report}.xlsx'
             self.output_xlsx(df1,file_name)
-
-    def overall_process(self):
-        df = self.read_xcel_file()
-        self.produce_reports(df)
 
 
 
@@ -45,4 +43,4 @@ if __name__ == '__main__':
 
     print(file_name,header_name)
     xsort = ExelSorter(file_name, header_name,drop_names)
-    xsort.overall_process()
+    xsort.produce_excel()
